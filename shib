@@ -1,0 +1,58 @@
+const Web3 = require('web3');
+const Tx = require('ethereumjs-tx').Transaction;
+
+// 连接到以太坊节点
+const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID');
+
+// 设置发送者地址和私钥
+const senderAddress = '0xYourSenderAddress';
+const privateKey = Buffer.from('YOUR_PRIVATE_KEY', 'hex');
+
+// 设置 SHIB 代币合约地址
+const shibContractAddress = '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE';
+
+// 设置接收者地址
+const recipientAddress = '0xRecipientAddress';
+
+// 设置转账金额（SHIB 代币的最小单位为 Shiboshi）
+const amountToSend = web3.utils.toBN('1000000000'); // 1,000,000,000 Shiboshi = 1 SHIB
+
+// 构造 SHIB 代币转账数据
+const data = web3.eth.abi.encodeFunctionCall({
+    name: 'transfer',
+    type: 'function',
+    inputs: [{
+        type: 'address',
+        name: 'to'
+    }, {
+        type: 'uint256',
+        name: 'value'
+    }]
+}, [recipientAddress, amountToSend.toString()]);
+
+// 构造交易对象
+const txObject = {
+    nonce: web3.utils.toHex(await web3.eth.getTransactionCount(senderAddress)),
+    gasLimit: web3.utils.toHex(300000),
+    gasPrice: web3.utils.toHex(await web3.eth.getGasPrice()),
+    to: shibContractAddress,
+    value: '0x0',
+    data: data,
+};
+
+// 签名交易
+const transaction = new Tx(txObject, { 'chain': 'mainnet' });
+transaction.sign(privateKey);
+
+// 发送签名的交易
+const serializedTx = transaction.serialize();
+web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
+    .on('transactionHash', (hash) => {
+        console.log('Transaction Hash:', hash);
+    })
+    .on('receipt', (receipt) => {
+        console.log('Transaction Receipt:', receipt);
+    })
+    .on('error', (error) => {
+        console.error('Error occurred:', error);
+    });
