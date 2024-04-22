@@ -1,0 +1,35 @@
+import okhttp3.*;
+
+import java.io.IOException;
+
+public class OkexTransfer {
+
+    public static void main(String[] args) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+
+        // 设置请求参数
+        RequestBody requestBody = new FormBody.Builder()
+                .add("currency", "OKB")
+                .add("amount", "10")  // 转账金额
+                .add("to", "recipient_address")  // 接收方地址
+                .build();
+
+        // 构建请求
+        Request request = new Request.Builder()
+                .url("https://www.okex.com/api/v1/withdraw.do")
+                .post(requestBody)
+                .addHeader("OK-ACCESS-KEY", "YOUR_API_KEY")
+                .addHeader("OK-ACCESS-SIGN", "SIGNATURE")
+                .addHeader("OK-ACCESS-TIMESTAMP", "TIMESTAMP")
+                .addHeader("OK-ACCESS-PASSPHRASE", "YOUR_PASSPHRASE")
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .build();
+
+        // 发起请求并获取响应
+        Response response = client.newCall(request).execute();
+        String responseBody = response.body().string();
+
+        // 输出响应结果
+        System.out.println(responseBody);
+    }
+}
