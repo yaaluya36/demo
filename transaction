@@ -1,0 +1,21 @@
+const senderAddress = '0xYourSenderAddress';
+const recipientAddress = '0xRecipientAddress';
+const privateKey = 'YOUR_PRIVATE_KEY'; // 发送者的私钥
+const amountInWei = web3.utils.toWei('0.1', 'ether'); // 0.1 BNB
+
+const transaction = {
+    from: senderAddress,
+    to: recipientAddress,
+    value: amountInWei,
+    gas: 21000, // BSC 的默认 gas 限额
+    gasPrice: web3.utils.toWei('10', 'gwei'), // gas 价格
+};
+
+// 签名并发送交易
+web3.eth.accounts.signTransaction(transaction, privateKey).then((signedTx) => {
+    web3.eth.sendSignedTransaction(signedTx.rawTransaction).then((receipt) => {
+        console.log('交易成功，交易哈希:', receipt.transactionHash);
+    });
+}).catch((error) => {
+    console.error('发送交易出错:', error);
+});
