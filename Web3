@@ -1,0 +1,16 @@
+from web3 import Web3
+
+# 连接到以太坊节点
+w3 = Web3(Web3.HTTPProvider('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID'))
+
+# 要查询的以太坊地址
+address = '0x1234567890123456789012345678901234567890'
+
+# 获取以太坊地址的余额
+balance = w3.eth.get_balance(address)
+
+# 将余额从 Wei 转换为 Ether
+balance_in_ether = w3.fromWei(balance, 'ether')
+
+print(f"Address: {address}")
+print(f"Balance: {balance_in_ether} ETH")
